@@ -6,8 +6,9 @@ from collections import namedtuple, OrderedDict, Counter, defaultdict
 import math
 import numpy as np
 from Bio import SeqIO
+import hdf5_gen
 from progressbar import AnimatedMarker, Bar, BouncingBar, ETA, \
-    ProgressBar, ReverseBar, RotatingMarker, \
+    ProgressBar, ReverseBar, \
     SimpleProgress, Timer
 
 LENGTH_OF_MATURE_16S = 1542
@@ -53,15 +54,15 @@ def by_strand_sorter(index, add_to_pos_reads, add_to_neg_reads, counter_pos, cou
     else:
         add_to_neg_reads.append(1)
 
-
+plot_data = namedtuple('PlottingData', ['nucl_data_16S', 'nucl_data_23S' ,'y_pos_16S', 'y_neg_16S', 'y_pos_23S',
+                                        'y_neg_23S', 'colour_16S', 'colour_23S', 'symbol'])
         
 def data_generator(index, standard_colour, ACA_colour, MqsR_colour, symbol):
 
     global all_operons, gene_dic
     
     GeneInfo = namedtuple('GeneInfo', ['start_pos', 'end_pos', 'column_label'])
-    plot_data = namedtuple('PlottingData', ['nucl_data_16S', 'nucl_data_23S' ,'y_pos_16S', 'y_neg_16S', 'y_pos_23S',
-                                            'y_neg_23S', 'colour_16S', 'colour_23S', 'symbol'])
+
     
     _16S = namedtuple('_16S', ['start_pos', 'end_pos'])
     _23S = namedtuple('_23S', ['start_pos', 'end_pos'])
@@ -196,30 +197,39 @@ def make_plot_all_reads(_input_, scatter_flag, MA_flag, three_prime_flag):
     """ Creates a MA plot or scatter plot against chosen rrnA operon from two CSV index files (index, positions, mapped against how many).
         Because my system has memory limitations with pandas I strip down the indexes before plotting them here. All reads data
         I want to show is present in the CSV file."""
-    
-    if three_prime_flag:
-        symbol_1 = 'o'
-        symbol_2 = 'D'
 
-    else:
-        symbol_1 = 'o'
-        symbol_2 = 'o'
+    hdf_filename = hdf5_gen.make_hdf_filename(_input_, scatter_flag, MA_flag, three_prime_flag)
 
-    #looks how many input files have been given
-    input_number = len(_input_)
-    
-    data_dic = {}
-    data_dic['data1'] = data_generator(_input_[0], 'b', 'r', 'm', symbol_1)
-
-    #Creates data necessary for plotting for every inputfile.
-    if input_number >= 2:
-        data_dic['data2'] = data_generator(_input_[1], 'g', 'r', 'm', symbol_2)
+    try:
+        data_dic = hdf5_gen.get_hdf_data(hdf_filename)
         
-    if input_number >= 3:
-        data_dic['data3'] = data_generator(_input_[2], 'y', 'c', 'm', symbol_1)
-        
-    if input_number == 4:
-        data_dic['data4'] = data_generator(_input_[3], 'g', 'c', 'm', symbol_2)
+    except IOError:
+
+        if three_prime_flag:
+            symbol_1 = 'o'
+            symbol_2 = 'D'
+
+        else:
+            symbol_1 = 'o'
+            symbol_2 = 'o'
+
+        #looks how many input files have been given
+        input_number = len(_input_)
+
+        data_dic = {}
+        data_dic['data1'] = data_generator(_input_[0], 'b', 'r', 'm', symbol_1)
+        #Creates data necessary for plotting for every inputfile.
+
+        if input_number >= 2:
+            data_dic['data2'] = data_generator(_input_[1], 'g', 'r', 'm', symbol_2)
+            
+        if input_number >= 3:
+            data_dic['data3'] = data_generator(_input_[2], 'y', 'c', 'm', symbol_1)
+            
+        if input_number == 4:
+            data_dic['data4'] = data_generator(_input_[3], 'g', 'c', 'm', symbol_2)
+
+        hdf5_gen.add_to_hdf(data_dic, hdf_filename)
  
     def onpick_16S(event):
         
