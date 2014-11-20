@@ -14,29 +14,42 @@ LENGTH_OF_MATURE_16S = 1542
 #LENGTH_OF_MATURE_23S = 2905
 LENGTH_OF_MATURE_23S = 2925
 
+from collections import defaultdict
+
 def mature_ribosome_RNA_divider(counter, rRNA):
     """ Takes dictionary containing all rRNA operon positions as keys and read counts in position as values as input.
     Generates a new dictionary representeing a blank 16S or 23S rRNA. Adds all those reads in appropriate position on
     the blank rRNA."""
     
-    ribosome_dict = {}
+    #ribosome_dict = {}
+    ribosome_dict_pos = defaultdict(float)
+    ribosome_dict_neg = defaultdict(float)
     if rRNA == "16S":
         subunit = 0
     elif rRNA == "23S":
         subunit = 1
         
     for operon in all_operons:
-        for value in range (gene_dic[operon][subunit].start_pos, gene_dic[operon][subunit].end_pos + 1):
-            if value in counter:
-                new_value = value - gene_dic[operon][subunit].start_pos + 1
-                if new_value not in ribosome_dict:
-                    ribosome_dict[new_value] = counter[value]
-                else:
-                    ribosome_dict[new_value] = ribosome_dict[new_value] + counter[value] + 1
-                    
-        
-    return ribosome_dict
-
+        if operon in ["rrnD", "rrnG"]:
+            operon_type = 'neg'
+        else:
+            operon_type = 'pos'
+            
+        for position, value in counter.items():
+            if math.fabs(position) not in range (gene_dic[operon][subunit].start_pos, gene_dic[operon][subunit].end_pos + 1):
+                continue
+                
+            if operon_type == 'pos':    
+                new_position = math.fabs(math.fabs(position) - gene_dic[operon][subunit].start_pos) + 1
+            else:
+                new_position = math.fabs(math.fabs(position) - gene_dic[operon][subunit].end_pos) + 1
+                
+            if (operon_type == 'pos' and position > 0) or (operon_type == 'neg' and position < 0):
+                ribosome_dict_pos[new_position] += math.fabs(value)
+            else:
+                ribosome_dict_neg[new_position] += math.fabs(value)
+            
+    return ribosome_dict_pos, ribosome_dict_neg
 
     
 def by_strand_sorter(index, add_to_pos_reads, add_to_neg_reads, counter_pos, counter_neg):
@@ -85,9 +98,9 @@ def data_generator(index, standard_colour, ACA_colour, MqsR_colour, symbol):
         
     all_operons = ['rrnA', 'rrnB', 'rrnC', 'rrnD', 'rrnE', 'rrnG', 'rrnH']
     
-    ref_genome_fasta_16S = 'rrsA.fasta'
+    ref_genome_fasta_16S = '/home/toomas/git/plot_generation/plotter/rrsA.fasta'
     #ref_genome_fasta_23S = 'rrlA.fasta'
-    ref_genome_fasta_23S = 'rrlA_extended.fasta'
+    ref_genome_fasta_23S = '/home/toomas/git/plot_generation/plotter/rrlA_extended.fasta'
     
     dataframe = pd.read_csv(index)
 
@@ -108,16 +121,9 @@ def data_generator(index, standard_colour, ACA_colour, MqsR_colour, symbol):
             #if value in range (1, 1453):
             if '+AC0-' in str(value):
                 value = int(float(str(value)[4:]))
-                #if gene_dic[selected_column][0].start_pos <= value <= gene_dic[selected_column][0].end_pos:
-                values_list_pos.append(value)
-            if '-' in str(value):
-                value = int(float(str(value)[1:]))
-                #if gene_dic[selected_column][0].start_pos <= value <= gene_dic[selected_column][0].end_pos:
-                values_list_neg.append(value)             
+                values_list_pos.append(value)          
             else:
-                #if value in range (gene_dic[selected_column][0].start_pos, gene_dic[selected_column][0].end_pos):
                 values_list_pos.append(int(float(value)))           
-            
             
             i += 1
             pbar.update(i)
@@ -129,7 +135,6 @@ def data_generator(index, standard_colour, ACA_colour, MqsR_colour, symbol):
         dataframe = dataframe_2
         print len(dataframe)
 
-        
     #deletes dataframes to free memory
     del dataframe
     del dataframe_2
@@ -139,12 +144,14 @@ def data_generator(index, standard_colour, ACA_colour, MqsR_colour, symbol):
     counter_neg = Counter(values_list_neg)
 
     # Puts all the reads from different operons on the same blank operon for both 16S and 23S mature RNA-s.
-    counter_pos_16S = mature_ribosome_RNA_divider(counter_pos, "16S")
-    counter_pos_23S = mature_ribosome_RNA_divider(counter_pos, "23S")
-    counter_neg_16S = mature_ribosome_RNA_divider(counter_neg, "16S")
-    counter_neg_23S = mature_ribosome_RNA_divider(counter_neg, "23S")
+    #counter_pos_16S = mature_ribosome_RNA_divider(counter_pos, "16S")
+    #counter_pos_23S = mature_ribosome_RNA_divider(counter_pos, "23S")
+    #counter_neg_16S = mature_ribosome_RNA_divider(counter_neg, "16S")
+    #counter_neg_23S = mature_ribosome_RNA_divider(counter_neg, "23S")
         
-        
+    counter_pos_16S, counter_neg_16S = mature_ribosome_RNA_divider(counter_pos, "16S")
+    counter_pos_23S, counter_neg_23S = mature_ribosome_RNA_divider(counter_pos, "23S")
+                
     #Create empty lists for storing reads 5 pr 3 prime position count on genome.
     #nucl_data = genome position, y = read count, pos and neg determine the strand orientation
     #colour = separates cutting seq from rest by colour, stores a color of dot on a plot for each nucleotide position
@@ -192,7 +199,7 @@ def data_generator(index, standard_colour, ACA_colour, MqsR_colour, symbol):
    
                            
 
-def make_plot_all_reads(_input_, scatter_flag, MA_flag, three_prime_flag):
+def make_plot_all_reads(_input_, scatter_flag, delta_scatter_flag, MA_flag, three_prime_flag):
     """ Creates a MA plot or scatter plot against chosen rrnA operon from two CSV index files (index, positions, mapped against how many).
         Because my system has memory limitations with pandas I strip down the indexes before plotting them here. All reads data
         I want to show is present in the CSV file."""
@@ -319,7 +326,7 @@ def make_plot_all_reads(_input_, scatter_flag, MA_flag, three_prime_flag):
     
     #Creates a MA plot. X is A and Y is M (look a bit back and you see they represent).
 
-    if MA_flag and scatter_flag:
+    if MA_flag and (scatter_flag or delta_scatter_flag):
         fig1, (ax11, ax12) = plt.subplots(2)
         fig2, (ax21, ax22) = plt.subplots(2)            
     else:
@@ -327,7 +334,7 @@ def make_plot_all_reads(_input_, scatter_flag, MA_flag, three_prime_flag):
         fig2, ax2 = plt.subplots()
     
     if MA_flag:
-        if scatter_flag:
+        if scatter_flag or delta_scatter_flag:
             ax1 = ax11
             ax2 = ax21
             
@@ -374,7 +381,41 @@ def make_plot_all_reads(_input_, scatter_flag, MA_flag, three_prime_flag):
             ax2.scatter(data_nt.nucl_data_23S, [-1 * data for data in data_nt.y_neg_23S],
                         alpha=0.5, c=data_nt.colour_23S, linewidths=( 0, 0, 0), picker=True, marker = data_nt.symbol)
 
+    if delta_scatter_flag:
+        if MA_flag:
+           ax1 = ax12
+           ax2 = ax22
+        
+        data_nt_pos_16S = [x1 - x2 for x1, x2 in zip(data_dic['data1'].y_pos_16S, data_dic['data2'].y_pos_16S)]
+        data_nt_pos_23S = [x1 - x2 for x1, x2 in zip(data_dic['data1'].y_pos_23S, data_dic['data2'].y_pos_23S)]
+        data_nt_neg_16S = [x1 - x2 for x1, x2 in zip(data_dic['data1'].y_neg_16S, data_dic['data2'].y_neg_16S)]
+        data_nt_neg_23S = [x1 - x2 for x1, x2 in zip(data_dic['data1'].y_neg_23S, data_dic['data2'].y_neg_23S)]
 
+        dict1 = []
+        [dict1.append((x, math.fabs(y))) for x, y in zip(data_dic['data1'].nucl_data_16S, data_nt_pos_16S)]
+        del dict1[0]
+        print sorted(dict1, key=lambda pos: pos[1],  reverse = True)[:15]
+        
+        #Generate 16S scatter plot.
+        ax1.set_ylabel('Read Count Difference', fontsize=14)
+        ax1.set_xlabel('Nucleotide Position', fontsize=14)
+        ax1.set_title('16S Scatterplot', fontsize=14)
+
+
+        ax1.scatter(data_dic['data1'].nucl_data_16S, data_nt_pos_16S, alpha=0.5, c=data_dic['data1'].colour_16S, linewidths=( 0, 0, 0), picker=True,
+                    marker = data_dic['data1'].symbol)
+        ax1.scatter(data_dic['data1'].nucl_data_16S, [-1 * data for data in data_nt_neg_16S],
+                    alpha=0.5, c=data_dic['data1'].colour_16S, linewidths=( 0, 0, 0), picker=True, marker = data_dic['data1'].symbol)
+
+        #Generate 23S scatter plot.
+        ax2.set_ylabel('Read Count Difference', fontsize=14)
+        ax2.set_xlabel('Nucleotide Position', fontsize=14)
+        ax2.set_title('23S Scatterplot', fontsize=14)
+
+        ax2.scatter(data_dic['data1'].nucl_data_23S, data_nt_pos_23S, alpha=0.5, c=data_dic['data1'].colour_23S, linewidths=( 0, 0, 0), picker=True,
+                    marker = data_dic['data1'].symbol)
+        ax2.scatter(data_dic['data1'].nucl_data_23S, [-1 * data for data in data_nt_neg_23S],
+                    alpha=0.5, c=data_dic['data1'].colour_23S, linewidths=( 0, 0, 0), picker=True, marker = data_dic['data1'].symbol)
 
 
     fig1.tight_layout()
@@ -385,3 +426,5 @@ def make_plot_all_reads(_input_, scatter_flag, MA_flag, three_prime_flag):
     fig2.canvas.mpl_connect('pick_event', onpick_23S)
 
     plt.show()
+
+    
