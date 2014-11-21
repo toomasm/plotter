@@ -10,9 +10,9 @@ from progressbar import AnimatedMarker, Bar, BouncingBar, ETA, \
     ProgressBar, ReverseBar, RotatingMarker, \
     SimpleProgress, Timer
 
-LENGTH_OF_MATURE_16S = 1542
+LENGTH_OF_MATURE_16S = 1582
 #LENGTH_OF_MATURE_23S = 2905
-LENGTH_OF_MATURE_23S = 2925
+LENGTH_OF_MATURE_23S = 2944
 
 from collections import defaultdict
 
@@ -79,6 +79,7 @@ def data_generator(index, standard_colour, ACA_colour, MqsR_colour, symbol):
     _16S = namedtuple('_16S', ['start_pos', 'end_pos'])
     _23S = namedtuple('_23S', ['start_pos', 'end_pos'])
 
+    #original 16S and 23S starting and ending position.
     '''gene_dic = OrderedDict([('rrnA', (_16S(4035531, 4037072), _23S(4037519, 4040423))),
                             ('rrnB', (_16S(4166659, 4168200), _23S(4168641, 4171544))),
                             ('rrnC', (_16S(3941808, 3943349), _23S(3943704, 3946607))),
@@ -87,20 +88,29 @@ def data_generator(index, standard_colour, ACA_colour, MqsR_colour, symbol):
                             ('rrnG', (_16S(2729616, 2731157), _23S(2726281, 2729184))),
                             ('rrnH', (_16S(223771, 225312), _23S(225759, 228662)))])'''
 
-    gene_dic = OrderedDict([('rrnA', (_16S(4035531, 4037072), _23S(4037499, 4040423))),
+    #23S 20 upstream of starting position.
+    '''gene_dic = OrderedDict([('rrnA', (_16S(4035531, 4037072), _23S(4037499, 4040423))),
                             ('rrnB', (_16S(4166659, 4168200), _23S(4168621, 4171544))),
                             ('rrnC', (_16S(3941808, 3943349), _23S(3943684, 3946607))),
                             ('rrnD', (_16S(3427221, 3428762), _23S(3423880, 3426803))),
                             ('rrnE', (_16S(4208147, 4209688), _23S(4210023, 4212946))),
                             ('rrnG', (_16S(2729616, 2731157), _23S(2726281, 2729204))),
-                            ('rrnH', (_16S(223771, 225312), _23S(225759, 228662)))])
+                            ('rrnH', (_16S(223771, 225312), _23S(225759, 228662)))])'''
 
-        
+    #23S and 16S 20 nucleotides before starting position and 20 nucleotides after ending positions.
+    gene_dic = OrderedDict([('rrnA', (_16S(4035511, 4037092), _23S(4037499, 4040443))),
+                            ('rrnB', (_16S(4166639, 4168220), _23S(4168621, 4171564))),
+                            ('rrnC', (_16S(3941788, 3943369), _23S(3943684, 3946627))),
+                            ('rrnD', (_16S(3427201, 3428782), _23S(3423880, 3426823))),
+                            ('rrnE', (_16S(4208127, 4209708), _23S(4210023, 4212966))),
+                            ('rrnG', (_16S(2729506, 2731177), _23S(2726281, 2729224))),
+                            ('rrnH', (_16S(223751, 225332), _23S(225759, 228682)))])
+
     all_operons = ['rrnA', 'rrnB', 'rrnC', 'rrnD', 'rrnE', 'rrnG', 'rrnH']
     
-    ref_genome_fasta_16S = '/home/toomas/git/plot_generation/plotter/rrsA.fasta'
+    ref_genome_fasta_16S = '/home/toomas/git/plot_generation/plotter/16S_new.fasta'
     #ref_genome_fasta_23S = 'rrlA.fasta'
-    ref_genome_fasta_23S = '/home/toomas/git/plot_generation/plotter/rrlA_extended.fasta'
+    ref_genome_fasta_23S = '/home/toomas/git/plot_generation/plotter/23S_new.fasta'
     
     dataframe = pd.read_csv(index)
 
@@ -177,7 +187,7 @@ def data_generator(index, standard_colour, ACA_colour, MqsR_colour, symbol):
             colour_16S.append(MqsR_colour)
         else:
             colour_16S.append(standard_colour)
-        nucl_data_16S.append(index)
+        nucl_data_16S.append(index-20)
         by_strand_sorter(index, y_pos_16S, y_neg_16S, counter_pos_16S, counter_neg_16S)
 
     for fasta in SeqIO.parse(ref_genome_fasta_23S, "fasta"):
