@@ -7,6 +7,8 @@ import math
 import numpy as np
 from Bio import SeqIO
 
+import hdf5_gen
+
 
 
 def by_strand_sorter(index, add_to_pos_reads, add_to_neg_reads, counter_pos, counter_neg):
@@ -41,7 +43,7 @@ def data_generator(index, selected_column, standard_colour, ACA_colour, MqsR_col
     all_operons = ['rrnA', 'rrnB', 'rrnC', 'rrnD', 'rrnE', 'rrnG', 'rrnH']
     operon_positions = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7']
 
-    ref_genome_fasta = '/home/toomas/git/RNA-tools/Toomas/genbank_mg1655.fasta'
+    ref_genome_fasta = 'genbank_mg1655.fasta'
 
     #selected_column = 'rrnA'
     selected_positions_column = gene_dic[selected_column].column_label
@@ -107,30 +109,39 @@ def make_plot(_input_, selected_column, scatter_flag, MA_flag, three_prime_flag)
         I want to show is present in the CSV file."""
 
     #Checks whether three_prime seq flag has been set. If yes makes symbols for ok reads 'o' and for shady reads '' 
-    if three_prime_flag:
-        symbol_1 = 'o'
-        symbol_2 = 'D'
+    hdf_filename = hdf5_gen.make_hdf_filename(_input_, scatter_flag, MA_flag, three_prime_flag, selected_column)
 
-    else:
-        symbol_1 = 'o'
-        symbol_2 = 'o'
-    
-    #looks how many input files have been given
-    input_number = len(_input_)
+    try:
+        data_dic = hdf5_gen.get_hdf_data(hdf_filename)
 
-    data_dic = {}
-    data_dic['data1'] = data_generator(_input_[0], selected_column, 'b', 'r', 'm', symbol_1)
+    except IOError:
 
-    #Creates data necessary for plotting for every inputfile.
-    if input_number >= 2:
-        data_dic['data2'] = data_generator(_input_[1], selected_column, 'b', 'r', 'm', symbol_2)
+        if three_prime_flag:
+            symbol_1 = 'o'
+            symbol_2 = 'D'
+
+        else:
+            symbol_1 = 'o'
+            symbol_2 = 'o'
         
-    if input_number >= 3:
-        data_dic['data3'] = data_generator(_input_[2], selected_column, 'g', 'c', 'm', symbol_1)
+        #looks how many input files have been given
+        input_number = len(_input_)
+
+        data_dic = {}
+        data_dic['data1'] = data_generator(_input_[0], selected_column, 'b', 'r', 'm', symbol_1)
+
+        #Creates data necessary for plotting for every inputfile.
+        if input_number >= 2:
+            data_dic['data2'] = data_generator(_input_[1], selected_column, 'b', 'r', 'm', symbol_2)
+            
+        if input_number >= 3:
+            data_dic['data3'] = data_generator(_input_[2], selected_column, 'g', 'c', 'm', symbol_1)
+            
+        if input_number == 4:
+            data_dic['data4'] = data_generator(_input_[3], selected_column, 'g', 'c', 'm', symbol_2)
         
-    if input_number == 4:
-        data_dic['data4'] = data_generator(_input_[3], selected_column, 'g', 'c', 'm', symbol_2)
-        
+        hdf5_gen.add_to_hdf(data_dic, hdf_filename)
+
     def onpick(event):
         
         #Gets the index of datapoint (index of X and Y)
