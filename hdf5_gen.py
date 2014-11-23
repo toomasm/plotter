@@ -1,5 +1,5 @@
 import numpy as np
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 import h5py
 
 plot_data = namedtuple('PlottingData', ['nucl_data_16S', 'nucl_data_23S' ,'y_pos_16S', 'y_neg_16S', 'y_pos_23S',
@@ -8,7 +8,7 @@ plot_data = namedtuple('PlottingData', ['nucl_data_16S', 'nucl_data_23S' ,'y_pos
 def get_hdf_data(primes, dataset_names,processing_names,_input_):
     compatibility_naming = ['data1', 'data2', 'data3', 'data4']
     with h5py.File('hdf5/plot_data.hdf', 'r') as h5file:
-        data_dic = {}
+        data_dic = defaultdict(lambda : defaultdict(dict))
         for i in range(len(_input_)):
             req_data = h5file[primes[i]][dataset_names[i]][processing_names[i]]
             for name, data in req_data.items():
@@ -32,10 +32,8 @@ def get_hdf_data(primes, dataset_names,processing_names,_input_):
                         data.append(x)
                 else:
                     data = np.array(data).tolist()
-
-                setattr(plot_data, name, data)
-                data_dic[compatibility_naming[i]] = plot_data
-    return data_dic
+                data_dic[compatibility_naming[i]][name] = data
+        return data_dic
 
 
 def add_to_hdf(data_dic, hdf_filename):

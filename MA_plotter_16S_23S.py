@@ -194,7 +194,6 @@ def data_generator(index, standard_colour, ACA_colour, MqsR_colour, symbol):
         nucl_data_23S.append(index-20)
         by_strand_sorter(index, y_pos_23S, y_neg_23S, counter_pos_23S, counter_neg_23S)
 
-
     return plot_data(nucl_data_16S, nucl_data_23S, y_pos_16S, y_neg_16S, y_pos_23S, y_neg_23S, colour_16S, colour_23S, symbol)
 
 
@@ -257,18 +256,18 @@ def make_plot_all_reads(_input_, scatter_flag, delta_scatter_flag, MA_flag, thre
         #Retrieves information from lists based on index of the datapoint.
         #The information to be displayed for datapoint has the same index as datapint.
 
-        nucleotide_pos = np.take(data_dic['data1'].nucl_data_16S, ind)
-        sample_1_pos_read_count = np.take(data_dic['data1'].y_pos_16S, ind)
-        sample_2_pos_read_count = np.take(data_dic['data2'].y_pos_16S, ind)
-        sample_1_neg_read_count = np.take(data_dic['data1'].y_neg_16S, ind)
-        sample_2_neg_read_count = np.take(data_dic['data2'].y_neg_16S, ind)
+        nucleotide_pos = np.take(data_dic['data1']['nucl_data_16S'], ind)
+        sample_1_pos_read_count = np.take(data_dic['data1']['y_pos_16S'], ind)
+        sample_2_pos_read_count = np.take(data_dic['data2']['y_pos_16S'], ind)
+        sample_1_neg_read_count = np.take(data_dic['data1']['y_neg_16S'], ind)
+        sample_2_neg_read_count = np.take(data_dic['data2']['y_neg_16S'], ind)
 
         if input_number >= 3:
-            sample_3_pos_read_count = np.take(data_dic['data3'].y_pos_16S, ind)
-            sample_3_neg_read_count = np.take(data_dic['data3'].y_neg_16S, ind)
+            sample_3_pos_read_count = np.take(data_dic['data3']['y_pos_16S'], ind)
+            sample_3_neg_read_count = np.take(data_dic['data3']['y_neg_16S'], ind)
         if input_number == 4:
-            sample_4_pos_read_count = np.take(data_dic['data4'].y_pos_16S, ind)
-            sample_4_neg_read_count = np.take(data_dic['data4'].y_neg_16S, ind)
+            sample_4_pos_read_count = np.take(data_dic['data4']['y_pos_16S'], ind)
+            sample_4_neg_read_count = np.take(data_dic['data4']['y_neg_16S'], ind)
 
         #Prints out data for datapoints in nucleotide position (X-axis)  that was covered with a click.
         #Prints out the read counts for + and - strand for nucleotide position in each sample present.
@@ -305,18 +304,18 @@ def make_plot_all_reads(_input_, scatter_flag, delta_scatter_flag, MA_flag, thre
         #Retrieves information from lists based on index of the datapoint.
         #The information to be displayed for datapoint has the same index as datapint.
 
-        nucleotide_pos = np.take(data_dic['data1'].nucl_data_23S, ind)
-        sample_1_pos_read_count = np.take(data_dic['data1'].y_pos_23S, ind)
-        sample_2_pos_read_count = np.take(data_dic['data2'].y_pos_23S, ind)
-        sample_1_neg_read_count = np.take(data_dic['data1'].y_neg_23S, ind)
-        sample_2_neg_read_count = np.take(data_dic['data2'].y_neg_23S, ind)
+        nucleotide_pos = np.take(data_dic['data1']['nucl_data_23S'], ind)
+        sample_1_pos_read_count = np.take(data_dic['data1']['y_pos_23S'], ind)
+        sample_2_pos_read_count = np.take(data_dic['data2']['y_pos_23S'], ind)
+        sample_1_neg_read_count = np.take(data_dic['data1']['y_neg_23S'], ind)
+        sample_2_neg_read_count = np.take(data_dic['data2']['y_neg_23S'], ind)
 
         if input_number >= 3:
-            sample_3_pos_read_count = np.take(data_dic['data3'].y_pos_23S, ind)
-            sample_3_neg_read_count = np.take(data_dic['data3'].y_neg_23S, ind)
+            sample_3_pos_read_count = np.take(data_dic['data3']['y_pos_23S'], ind)
+            sample_3_neg_read_count = np.take(data_dic['data3']['y_neg_23S'], ind)
         if input_number == 4:
-            sample_4_pos_read_count = np.take(data_dic['data4'].y_pos_23S, ind)
-            sample_4_neg_read_count = np.take(data_dic['data4'].y_neg_23S, ind)
+            sample_4_pos_read_count = np.take(data_dic['data4']['y_pos_23S'], ind)
+            sample_4_neg_read_count = np.take(data_dic['data4']['y_neg_23S'], ind)
 
         #Prints out data for datapoints in nucleotide position (X-axis)  that was covered with a click.
         #Prints out the read counts for + and - strand for nucleotide position in each sample present.
@@ -360,20 +359,20 @@ def make_plot_all_reads(_input_, scatter_flag, delta_scatter_flag, MA_flag, thre
             ax2 = ax21
 
         #Generates data for MA plot.
-        MA_X_16S = [(math.log(float(y1), 2) + math.log(float(y2), 2))/2 for y1, y2 in zip(data_dic['data1'].y_pos_16S, data_dic['data2'].y_pos_16S)]
-        MA_Y_16S = [math.log((float(y1)/y2), 2) for y1, y2 in zip(data_dic['data1'].y_pos_16S, data_dic['data2'].y_pos_16S)]
+        MA_X_16S = [(math.log(float(y1), 2) + math.log(float(y2), 2))/2 for y1, y2 in zip(data_dic['data1']['y_pos_16S'], data_dic['data2']['y_pos_16S'])]
+        MA_Y_16S = [math.log((float(y1)/y2), 2) for y1, y2 in zip(data_dic['data1']['y_pos_16S'], data_dic['data2']['y_pos_16S'])]
 
-        MA_X_23S = [(math.log(float(y1), 2) + math.log(float(y2), 2))/2 for y1, y2 in zip(data_dic['data1'].y_pos_23S, data_dic['data2'].y_pos_23S)]
-        MA_Y_23S = [math.log((float(y1)/y2), 2) for y1, y2 in zip(data_dic['data1'].y_pos_23S, data_dic['data2'].y_pos_23S)]
+        MA_X_23S = [(math.log(float(y1), 2) + math.log(float(y2), 2))/2 for y1, y2 in zip(data_dic['data1']['y_pos_23S'], data_dic['data2']['y_pos_23S'])]
+        MA_Y_23S = [math.log((float(y1)/y2), 2) for y1, y2 in zip(data_dic['data1']['y_pos_23S'], data_dic['data2']['y_pos_23S'])]
 
 
         ax1.set_ylabel('M', fontsize=20)
         ax1.set_xlabel('A', fontsize=20)
-        ax1.scatter(MA_X_16S, MA_Y_16S, alpha=0.5, c=data_dic["data1"].colour_16S, linewidths=( 0, 0, 0), picker=True)
+        ax1.scatter(MA_X_16S, MA_Y_16S, alpha=0.5, c=data_dic["data1"]['colour_16S'], linewidths=( 0, 0, 0), picker=True)
 
         ax2.set_ylabel('M', fontsize=20)
         ax2.set_xlabel('A', fontsize=20)
-        ax2.scatter(MA_X_23S, MA_Y_23S, alpha=0.5, c=data_dic["data1"].colour_23S, linewidths=( 0, 0, 0), picker=True)
+        ax2.scatter(MA_X_23S, MA_Y_23S, alpha=0.5, c=data_dic["data1"]['colour_23S'], linewidths=( 0, 0, 0), picker=True)
 
 
     #Creates a scatter plot. X is nucleotide position (for selected rrnA operon), Y is read count on specific position.
@@ -388,9 +387,9 @@ def make_plot_all_reads(_input_, scatter_flag, delta_scatter_flag, MA_flag, thre
         ax1.set_title('16S Scatterplot', fontsize=14)
 
         for data_key, data_nt in data_dic.items():#[data1, data2, data3, data4]:
-            ax1.scatter(data_nt.nucl_data_16S, data_nt.y_pos_16S, alpha=0.5, c=data_nt.colour_16S, linewidths=( 0, 0, 0), picker=True, marker = data_nt.symbol)
-            ax1.scatter(data_nt.nucl_data_16S, [-1 * data for data in data_nt.y_neg_16S],
-                        alpha=0.5, c=data_nt.colour_16S, linewidths=( 0, 0, 0), picker=True, marker = data_nt.symbol)
+            ax1.scatter(data_nt['nucl_data_16S'], data_nt['y_pos_16S'], alpha=0.5, c=data_nt['colour_16S'], linewidths=( 0, 0, 0), picker=True, marker = data_nt['symbol'])
+            ax1.scatter(data_nt['nucl_data_16S'], [-1 * data for data in data_nt['y_neg_16S']],
+                        alpha=0.5, c=data_nt['colour_16S'], linewidths=( 0, 0, 0), picker=True, marker = data_nt['symbol'])
 
         #Generate 23S scatter plot.
         ax2.set_ylabel('Read Counts', fontsize=14)
@@ -398,22 +397,22 @@ def make_plot_all_reads(_input_, scatter_flag, delta_scatter_flag, MA_flag, thre
         ax2.set_title('23S Scatterplot', fontsize=14)
 
         for data_key, data_nt in data_dic.items():#[data1, data2, data3, data4]:
-            ax2.scatter(data_nt.nucl_data_23S, data_nt.y_pos_23S, alpha=0.5, c=data_nt.colour_23S, linewidths=( 0, 0, 0), picker=True, marker = data_nt.symbol)
-            ax2.scatter(data_nt.nucl_data_23S, [-1 * data for data in data_nt.y_neg_23S],
-                        alpha=0.5, c=data_nt.colour_23S, linewidths=( 0, 0, 0), picker=True, marker = data_nt.symbol)
+            ax2.scatter(data_nt['nucl_data_23S'], data_nt['y_pos_23S'], alpha=0.5, c=data_nt['colour_23S'], linewidths=( 0, 0, 0), picker=True, marker = data_nt['symbol'])
+            ax2.scatter(data_nt['nucl_data_23S'], [-1 * data for data in data_nt['y_neg_23S']],
+                        alpha=0.5, c=data_nt['colour_23S'], linewidths=( 0, 0, 0), picker=True, marker = data_nt['symbol'])
 
     if delta_scatter_flag:
         if MA_flag:
            ax1 = ax12
            ax2 = ax22
 
-        data_nt_pos_16S = [x1 - x2 for x1, x2 in zip(data_dic['data1'].y_pos_16S, data_dic['data2'].y_pos_16S)]
-        data_nt_pos_23S = [x1 - x2 for x1, x2 in zip(data_dic['data1'].y_pos_23S, data_dic['data2'].y_pos_23S)]
-        data_nt_neg_16S = [x1 - x2 for x1, x2 in zip(data_dic['data1'].y_neg_16S, data_dic['data2'].y_neg_16S)]
-        data_nt_neg_23S = [x1 - x2 for x1, x2 in zip(data_dic['data1'].y_neg_23S, data_dic['data2'].y_neg_23S)]
+        data_nt_pos_16S = [x1 - x2 for x1, x2 in zip(data_dic['data1']['y_pos_16S'], data_dic['data2']['y_pos_16S'])]
+        data_nt_pos_23S = [x1 - x2 for x1, x2 in zip(data_dic['data1']['y_pos_23S'], data_dic['data2']['y_pos_23S'])]
+        data_nt_neg_16S = [x1 - x2 for x1, x2 in zip(data_dic['data1']['y_neg_16S'], data_dic['data2']['y_neg_16S'])]
+        data_nt_neg_23S = [x1 - x2 for x1, x2 in zip(data_dic['data1']['y_neg_23S'], data_dic['data2']['y_neg_23S'])]
 
         dict1 = []
-        [dict1.append((x, math.fabs(y))) for x, y in zip(data_dic['data1'].nucl_data_16S, data_nt_pos_16S)]
+        [dict1.append((x, math.fabs(y))) for x, y in zip(data_dic['data1']['nucl_data_16S'], data_nt_pos_16S)]
         del dict1[0]
         print sorted(dict1, key=lambda pos: pos[1],  reverse = True)[:15]
 
@@ -423,20 +422,20 @@ def make_plot_all_reads(_input_, scatter_flag, delta_scatter_flag, MA_flag, thre
         ax1.set_title('16S Scatterplot', fontsize=14)
 
 
-        ax1.scatter(data_dic['data1'].nucl_data_16S, data_nt_pos_16S, alpha=0.5, c=data_dic['data1'].colour_16S, linewidths=( 0, 0, 0), picker=True,
-                    marker = data_dic['data1'].symbol)
-        ax1.scatter(data_dic['data1'].nucl_data_16S, [-1 * data for data in data_nt_neg_16S],
-                    alpha=0.5, c=data_dic['data1'].colour_16S, linewidths=( 0, 0, 0), picker=True, marker = data_dic['data1'].symbol)
+        ax1.scatter(data_dic['data1']['nucl_data_16S'], data_nt_pos_16S, alpha=0.5, c=data_dic['data1']['colour_16S'], linewidths=( 0, 0, 0), picker=True,
+                    marker = data_dic['data1']['symbol'])
+        ax1.scatter(data_dic['data1']['nucl_data_16S'], [-1 * data for data in data_nt_neg_16S],
+                    alpha=0.5, c=data_dic['data1']['colour_16S'], linewidths=( 0, 0, 0), picker=True, marker = data_dic['data1']['symbol'])
 
         #Generate 23S scatter plot.
         ax2.set_ylabel('Read Count Difference', fontsize=14)
         ax2.set_xlabel('Nucleotide Position', fontsize=14)
         ax2.set_title('23S Scatterplot', fontsize=14)
 
-        ax2.scatter(data_dic['data1'].nucl_data_23S, data_nt_pos_23S, alpha=0.5, c=data_dic['data1'].colour_23S, linewidths=( 0, 0, 0), picker=True,
-                    marker = data_dic['data1'].symbol)
-        ax2.scatter(data_dic['data1'].nucl_data_23S, [-1 * data for data in data_nt_neg_23S],
-                    alpha=0.5, c=data_dic['data1'].colour_23S, linewidths=( 0, 0, 0), picker=True, marker = data_dic['data1'].symbol)
+        ax2.scatter(data_dic['data1']['nucl_data_23S'], data_nt_pos_23S, alpha=0.5, c=data_dic['data1']['colour_23S'], linewidths=( 0, 0, 0), picker=True,
+                    marker = data_dic['data1']['symbol'])
+        ax2.scatter(data_dic['data1']['nucl_data_23S'], [-1 * data for data in data_nt_neg_23S],
+                    alpha=0.5, c=data_dic['data1']['colour_23S'], linewidths=( 0, 0, 0), picker=True, marker = data_dic['data1']['symbol'])
 
 
     fig1.tight_layout()
