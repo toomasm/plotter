@@ -102,9 +102,9 @@ def workdir_and_names(input_name):
 def process_arguments(args):
 
     #Changes working directory to first input files directory.
-    abspath = os.path.abspath(args.input_filename[0])
-    dir_name = os.path.dirname(abspath)
-    os.chdir(dir_name)
+    #abspath = os.path.abspath(args.input_filename[0])
+    #dir_name = os.path.dirname(abspath)
+    #os.chdir(dir_name)
     
     #Checks that there are no more inputs than 4.
     if len(args.input_filename) > 4:

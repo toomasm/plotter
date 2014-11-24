@@ -108,9 +108,9 @@ def data_generator(index, standard_colour, ACA_colour, MqsR_colour, symbol):
 
     all_operons = ['rrnA', 'rrnB', 'rrnC', 'rrnD', 'rrnE', 'rrnG', 'rrnH']
     
-    ref_genome_fasta_16S = '/home/toomas/git/plot_generation/plotter/16S_new.fasta'
+    ref_genome_fasta_16S = 'data/16S_new.fasta'
     #ref_genome_fasta_23S = 'rrlA.fasta'
-    ref_genome_fasta_23S = '/home/toomas/git/plot_generation/plotter/23S_new.fasta'
+    ref_genome_fasta_23S = 'data/23S_new.fasta'
     
     dataframe = pd.read_csv(index)
 
