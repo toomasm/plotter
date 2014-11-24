@@ -52,6 +52,10 @@ def make_argument_parser():
     plotting_args.add_argument('-MA', '--MA-plot', action = 'store_true',
                                 dest='MA_plot', default=None, 
                                 help='Makes a MA scatter plot from 2 CSV files. Two files required for input. Use -i2')
+
+    plotting_args.add_argument('-d', '--delta-scatter-plot', action = 'store_true',
+                                dest='delta_scatter_plot', default=None, 
+                                help='Makes a scatter plot from CSV file.')
     
     plotting_args.add_argument('-3', '--three_prime', action = 'store_true',
                                 dest='three_prime', default=False, 
@@ -141,13 +145,13 @@ def process_arguments(args):
 
 
     #When one plotting argument is set, check if operon has been set to map against.
-    if args.scatter_plot or args.MA_plot:
+    if args.scatter_plot or args.MA_plot or args.delta_scatter_plot:
             
         if args.input_filename and args.plot_all_reads:
-            make_plot_all_reads(CSV_N, args.scatter_plot, args.MA_plot, args.three_prime)
+            make_plot_all_reads(CSV_N, args.scatter_plot, args.delta_scatter_plot, args.MA_plot, args.three_prime)
         elif args.input_filename:
             
-            make_plot(CSV_N, args.show_on_operon, args.scatter_plot, args.MA_plot, args.three_prime)
+            make_plot(CSV_N, args.show_on_operon, args.scatter_plot, args.delta_scatter_plot, args.MA_plot, args.three_prime)
 
             
 if __name__ == '__main__':

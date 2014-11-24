@@ -96,7 +96,7 @@ def data_generator(index, selected_column, standard_colour, ACA_colour, MqsR_col
                            
     return plot_data(nucl_data, y_pos, y_neg, colour, symbol)
 
-def make_plot(_input_, selected_column, scatter_flag, MA_flag, three_prime_flag):
+def make_plot(_input_, selected_column, scatter_flag, delta_scatter_plot, MA_flag, three_prime_flag):
     """ Creates a MA plot or scatter plot against chosen rrnA operon from two CSV index files (index, positions, mapped against how many).
 
         Scatter plot can be made from up to 4 files. 3 files can be plotted againist each other normaly. With 4 files the program assumes

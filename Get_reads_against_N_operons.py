@@ -13,7 +13,7 @@ def pandas_processer(index, root_ext, N_of_operons):
     df = df.fillna(0)
 
     #Create a new column in dataframe, which contains the number of rRNA operons which read maps to. 
-    df['gene_count'] = df['rrsA'] + df['rrsB'] + df['rrsC'] + df['rrsD'] + df['rrsE'] + df['rrsG'] + df['rrsH']
+    df['gene_count'] = df['rrnA'] + df['rrnB'] + df['rrnC'] + df['rrnD'] + df['rrnE'] + df['rrnG'] + df['rrnH']
     #Creates a new fataframe which contains only reads which map to only a certain number of rRNA operons
     #selected_df = df.query('gene_count == 7')
     for k in ['Readname', 'rrsA', 'rrsB', 'rrsC', 'rrsD', 'rrsE', 'rrsG', 'rrsH']:
