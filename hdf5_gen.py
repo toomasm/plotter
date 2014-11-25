@@ -1,9 +1,7 @@
 import numpy as np
-from collections import namedtuple, defaultdict
+from collections import defaultdict
 import h5py
 
-plot_data = namedtuple('PlottingData', ['nucl_data_16S', 'nucl_data_23S' ,'y_pos_16S', 'y_neg_16S', 'y_pos_23S',
-                                        'y_neg_23S', 'colour_16S', 'colour_23S', 'symbol'])
 
 def get_hdf_data(primes, dataset_names,processing_names,_input_):
     compatibility_naming = ['data1', 'data2', 'data3', 'data4']

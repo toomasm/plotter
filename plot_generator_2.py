@@ -17,7 +17,7 @@ def make_argument_parser():
                              This script takes indexed CSV files (index, readname, rRNA operons, positions) as an input and creates scatter plots
                              (X = position, Y = read count) MA scatter plots. You can choose against which MG1655 E. coli operon (Genbank version 913.3)
                              you want the reads to be plotted.
-                                                         
+
                              On scatter plot you can plot both negative and positive strand reads (negative strand will be on -Y axis).
                              You can specify if you want to show reads that map to all operons or only to some.
                              '''))
@@ -44,39 +44,42 @@ def make_argument_parser():
                                                  rrnH')
 
     plotting_args = parser.add_argument_group('Plotting options.')
-    
+    plotting_args.add_argument('-d', '--delta-scatter', action = 'store_true',
+                            dest='delta_scatter', default=None,
+                            help='Makes a scatter plot from CSV file.')
+
     plotting_args.add_argument('-s', '--scatter-plot', action = 'store_true',
-                                dest='scatter_plot', default=None, 
+                                dest='scatter_plot', default=None,
                                 help='Makes a scatter plot from CSV file.')
-    
+
     plotting_args.add_argument('-MA', '--MA-plot', action = 'store_true',
-                                dest='MA_plot', default=None, 
+                                dest='MA_plot', default=None,
                                 help='Makes a MA scatter plot from 2 CSV files. Two files required for input. Use -i2')
-    
+
     plotting_args.add_argument('-3', '--three_prime', action = 'store_true',
-                                dest='three_prime', default=False, 
+                                dest='three_prime', default=False,
                                 help='Flag that sets parameters for scatter plot to show three prime seq data. Poly \
                                      A tail problem has led us to generate ok and shady reads for each 3 prime treatment.\n\n\
                                      Input has to be always 4 files if this flag is set. The program assumas that you enter them in \
                                      order of sample 1 ok, sample 1 shady, sample 2 ok, sample 2 shady.')
 
     plotting_args.add_argument('-a', '--plot_all_reads', action = 'store_true',
-                                dest='plot_all_reads', default=False, 
+                                dest='plot_all_reads', default=False,
                                 help='Plots all reads that have been mapped to any rrnA operon against 16S and 23S rRNA')
 
     input_args = parser.add_argument_group('Data input options.')
-    
-    input_args.add_argument('-i', '--input-file', 
+
+    input_args.add_argument('-i', '--input-file',
                                 dest='input_filename', default=None, required = True, nargs = '+',
                                 help='Input filename. This argument takes in upto 4 CSV files. Used for plotting two to four datasets upon one another \
                                       or one dataset by itself.\
                                       Required argument')
 
-    
+
     return parser
 
 
-    
+
 def workdir_and_names(input_name):
     """ Gets the basename, root extention and file extention of input file. """
 
@@ -94,14 +97,14 @@ def workdir_and_names(input_name):
     return input_data(base_name, root_ext, input_filetype)
 
 
-    
+
 def process_arguments(args):
 
     #Changes working directory to first input files directory.
     abspath = os.path.abspath(args.input_filename[0])
     dir_name = os.path.dirname(abspath)
     os.chdir(dir_name)
-    
+
     #Checks that there are no more inputs than 4.
     if len(args.input_filename) > 4:
         raise UserWarning ('Maximum number of inputs is 4!')
@@ -122,7 +125,7 @@ def process_arguments(args):
         #Checks if input file is  csv file.
         if name_of_input[name].file_type != '.csv':
             raise UserWarning ('Inputs must be CSV files.')
-            
+
     #Generates a directory for plots if not present in working directory or is not the working directory.
     if not os.path.exists('plots'):
         os.makedirs('plots')
@@ -136,23 +139,22 @@ def process_arguments(args):
         for inputs in input_list:
             CSV_N.append(pandas_processer(inputs.base_name, inputs.root_ext, args.mapped_to_N_operons))
     else:
-        #If inputfiles are already ok for plotting makes the inputfile list the list to contain plotting data. 
+        #If inputfiles are already ok for plotting makes the inputfile list the list to contain plotting data.
         CSV_N = args.input_filename
 
 
     #When one plotting argument is set, check if operon has been set to map against.
     if args.scatter_plot or args.MA_plot:
-            
+
         if args.input_filename and args.plot_all_reads:
-            make_plot_all_reads(CSV_N, args.scatter_plot, args.MA_plot, args.three_prime)
+            make_plot_all_reads(CSV_N, args.scatter_plot,args.delta_scatter, args.MA_plot, args.three_prime)
         elif args.input_filename:
-            
+
             make_plot(CSV_N, args.show_on_operon, args.scatter_plot, args.MA_plot, args.three_prime)
 
-            
+
 if __name__ == '__main__':
 
     p = make_argument_parser()
     args = p.parse_args()
     process_arguments(args)
-    

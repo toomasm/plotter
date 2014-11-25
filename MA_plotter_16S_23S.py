@@ -101,7 +101,6 @@ def data_generator(index, standard_colour, ACA_colour, MqsR_colour, symbol):
     ref_genome_fasta_16S = 'rrsA.fasta'
     #ref_genome_fasta_23S = 'rrlA.fasta'
     ref_genome_fasta_23S = 'rrlA_extended.fasta'
-
     dataframe = pd.read_csv(index)
 
     values_list_pos = []
