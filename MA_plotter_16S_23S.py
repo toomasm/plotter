@@ -30,19 +30,31 @@ def mature_ribosome_RNA_divider(counter, rRNA):
         subunit = 1
         
     for operon in all_operons:
+
+        #Change in positions to compensate the deletions and insertions in rrlA.
+        compensate_dif = 0
+        
         if operon in ["rrnD", "rrnG"]:
             operon_type = 'neg'
         else:
             operon_type = 'pos'
-            
+
+        # rrlA (23S of rrnA operon) has 2 insertion and 1 deletion compared to other 6 rrnA-s.
+        #This code is compensating for that while placing reads on our general ribosomal RNA.
+        if operon == "rrnA":
+            if math.fabs(position) in range (4038692, 4039385):
+                compensate_dif = 1
+            elif math.fabs(position) in range (4039391, 4040443+1):
+                compensate_dif = -1
+        
         for position, value in counter.items():
             if math.fabs(position) not in range (gene_dic[operon][subunit].start_pos, gene_dic[operon][subunit].end_pos + 1):
                 continue
-                
+                    
             if operon_type == 'pos':    
-                new_position = math.fabs(math.fabs(position) - gene_dic[operon][subunit].start_pos) + 1
+                new_position = math.fabs(math.fabs(position) - gene_dic[operon][subunit].start_pos) + 1 + compensate_dif
             else:
-                new_position = math.fabs(math.fabs(position) - gene_dic[operon][subunit].end_pos) + 1
+                new_position = math.fabs(math.fabs(position) - gene_dic[operon][subunit].end_pos) + 1 + compensate_dif
                 
             if (operon_type == 'pos' and position > 0) or (operon_type == 'neg' and position < 0):
                 ribosome_dict_pos[new_position] += math.fabs(value)
@@ -98,15 +110,16 @@ def data_generator(index, standard_colour, ACA_colour, MqsR_colour, symbol):
                             ('rrnH', (_16S(223771, 225312), _23S(225759, 228662)))])'''
 
     #23S and 16S 20 nucleotides before starting position and 20 nucleotides after ending positions.
-    gene_dic = OrderedDict([('rrnA', (_16S(4035511, 4037092), _23S(4037499, 4040443))),
-                            ('rrnB', (_16S(4166639, 4168220), _23S(4168621, 4171564))),
+   
+    gene_dic = OrderedDict([('rrnB', (_16S(4166639, 4168220), _23S(4168621, 4171564))),
                             ('rrnC', (_16S(3941788, 3943369), _23S(3943684, 3946627))),
                             ('rrnD', (_16S(3427201, 3428782), _23S(3423880, 3426823))),
                             ('rrnE', (_16S(4208127, 4209708), _23S(4210023, 4212966))),
                             ('rrnG', (_16S(2729506, 2731177), _23S(2726281, 2729224))),
-                            ('rrnH', (_16S(223751, 225332), _23S(225759, 228682)))])
+                            ('rrnH', (_16S(223751, 225332), _23S(225759, 228682))),
+                            ('rrnA', (_16S(4035511, 4037092), _23S(4037499, 4040443)))])
 
-    all_operons = ['rrnA', 'rrnB', 'rrnC', 'rrnD', 'rrnE', 'rrnG', 'rrnH']
+    all_operons = ['rrnB', 'rrnC', 'rrnD', 'rrnE', 'rrnG', 'rrnH', 'rrnA']
     
     ref_genome_fasta_16S = 'data/16S_new.fasta'
     #ref_genome_fasta_23S = 'rrlA.fasta'
@@ -401,10 +414,25 @@ def make_plot_all_reads(_input_, scatter_flag, delta_scatter_flag, MA_flag, thre
         data_nt_neg_16S = [x1 - x2 for x1, x2 in zip(data_dic['data1'].y_neg_16S, data_dic['data2'].y_neg_16S)]
         data_nt_neg_23S = [x1 - x2 for x1, x2 in zip(data_dic['data1'].y_neg_23S, data_dic['data2'].y_neg_23S)]
 
-        dict1 = []
-        [dict1.append((x, math.fabs(y))) for x, y in zip(data_dic['data1'].nucl_data_16S, data_nt_pos_16S)]
-        del dict1[0]
-        print sorted(dict1, key=lambda pos: pos[1],  reverse = True)[:15]
+        """df_16S_pos = pd.read_csv("16S_pos_PNK.csv", index_col=0)
+        df_23S_pos = pd.read_csv("23S_pos_PNK.csv", index_col=0)
+        df_16S_neg = pd.read_csv("16S_neg_PNK.csv", index_col=0)
+        df_23S_neg = pd.read_csv("23S_neg_PNK.csv", index_col=0)
+
+        df_16S_pos["MazF_PNK/MG_log_PNK"]["delta_count"] = data_nt_pos_16S
+        df_23S_pos["MazF_PNK/MG_log_PNK"]["delta_count"] = data_nt_pos_23S
+        df_16S_neg["MazF_PNK/MG_log_PNK"]["delta_count"] = data_nt_neg_16S
+        df_23S_neg["MazF_PNK/MG_log_PNK"]["delta_count"] = data_nt_neg_23S
+        
+        df_16S_pos.to_csv("16S_table_pos.csv", index=True ,header=True)
+        df_23S_pos.to_csv("23S_table_pos.csv", index=True ,header=True)
+        df_16S_neg.to_csv("16S_table_neg.csv", index=True ,header=True)
+        df_23S_neg.to_csv("23S_table_neg.csv", index=True ,header=True)"""
+        
+        #dict1 = []
+        #[dict1.append((x, math.fabs(y))) for x, y in zip(data_dic['data1'].nucl_data_16S, data_nt_pos_16S)]
+        #del dict1[0]
+        #print sorted(dict1, key=lambda pos: pos[1],  reverse = True)[:15]
         
         #Generate 16S scatter plot.
         ax1.set_ylabel('Read Count Difference', fontsize=14)
