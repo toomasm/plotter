@@ -43,8 +43,16 @@ def make_argument_parser():
                                                  rrnH')
 
     plotting_args = parser.add_argument_group('Plotting options.')
-    plotting_args.add_argument('-s', '--scatter-plot', action = 'store_true',
-                                help='Makes a scatter plot from CSV file.')
+    plotting_args.add_argument('-s', '--scatter-plot',
+                                help='Makes a scatter plot from CSV or appropriate hdf5 file.\
+                                      \n\
+                                      You have to specifify if you want the data to be shown as "counts" or "percent".\
+                                      "counts" = 5 prime read end counts per rRNA position. Positive strand read 5 prime end counts\
+                                      are shown + and negative strand counts as - on y scale.\n\
+                                      "percent" represents your data as relative percentage of 5 prime read end count\
+                                      (compared against corresponding mature rRNA-s 5 prime ends 5 prime read ends count).\
+                                      Only positive strand reads are shown with this option.')
+    
     plotting_args.add_argument('-MA', '--MA-plot', action = 'store_true',
                                 help='Makes a MA scatter plot from 2 CSV files. Two files required for input. Use -i2')
 
@@ -62,10 +70,12 @@ def make_argument_parser():
                                 help='Plots all reads that have been mapped to any rrnA operon against 16S and 23S rRNA')
 
     input_args = parser.add_argument_group('Data input options.')
-                                dest='input_filename', default=None, required = True, nargs = '+',
-                                help='Input filename. This argument takes in upto 4 CSV files. Used for plotting two to four datasets upon one another \
-                                      or one dataset by itself.\
-                                      Required argument')
+
+    input_args.add_argument('-i', '--input-file', 
+                            dest='input_filename', default=None, required = True, nargs = '+',
+                            help='Input filename. This argument takes in upto 4 CSV files. Used for plotting two to four datasets upon one another \
+                                  or one dataset by itself.\
+                                  Required argument')
 
     return parser
 
