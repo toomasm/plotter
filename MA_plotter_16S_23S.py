@@ -12,7 +12,7 @@ from progressbar import Bar, ETA, \
     ProgressBar, ReverseBar
 import os
 
-LENGTH_OF_MATURE_16S = 1582
+LENGTH_OF_MATURE_17S = 1690
 #LENGTH_OF_MATURE_23S = 2905
 LENGTH_OF_MATURE_23S = 2944
 
@@ -41,17 +41,17 @@ def mature_ribosome_RNA_divider(counter, rRNA):
         else:
             operon_type = 'pos'
 
-        # rrlA (23S of rrnA operon) has 2 insertion and 1 deletion compared to other 6 rrnA-s.
-        #This code is compensating for that while placing reads on our general ribosomal RNA.
-        if operon == "rrnA":
-            if math.fabs(position) in range (4038692, 4039385):
-                compensate_dif = 1
-            elif math.fabs(position) in range (4039391, 4040443+1):
-                compensate_dif = -1
-
         for position, value in counter.items():
             if math.fabs(position) not in range (gene_dic[operon][subunit].start_pos, gene_dic[operon][subunit].end_pos + 1):
                 continue
+
+            # rrlA (23S of rrnA operon) has 2 insertion and 1 deletion compared to other 6 rrnA-s.
+            #This code is compensating for that while placing reads on our general ribosomal RNA.
+            if operon == "rrnA":
+                if math.fabs(position) in range (4038692, 4039385):
+                    compensate_dif = 1
+                elif math.fabs(position) in range (4039391, 4040443+1):
+                    compensate_dif = -1
 
             if operon_type == 'pos':
                 new_position = math.fabs(math.fabs(position) - gene_dic[operon][subunit].start_pos) + 1 + compensate_dif
@@ -100,7 +100,7 @@ def data_generator(index, standard_colour, ACA_colour, MqsR_colour, symbol):
                             ('rrnD', (_16S(3427221, 3428762), _23S(3423880, 3426783))),
                             ('rrnE', (_16S(4208147, 4209688), _23S(4210043, 4212946))),
                             ('rrnG', (_16S(2729616, 2731157), _23S(2726281, 2729184))),
-                            ('rrnH', (_16S(223771, 225312), _23S(225759, 228662)))])'''
+                            ('rrnH', (_16S(223771, 225312), _23S(225759, 228662)))])
 
     #23S and 16S 20 nucleotides before starting position and 20 nucleotides after ending positions.
 
@@ -110,11 +110,21 @@ def data_generator(index, standard_colour, ACA_colour, MqsR_colour, symbol):
                             ('rrnE', (_16S(4208127, 4209708), _23S(4210023, 4212966))),
                             ('rrnG', (_16S(2729506, 2731177), _23S(2726281, 2729224))),
                             ('rrnH', (_16S(223751, 225332), _23S(225759, 228682))),
-                            ('rrnA', (_16S(4035511, 4037092), _23S(4037499, 4040443)))])
+                            ('rrnA', (_16S(4035511, 4037092), _23S(4037499, 4040443)))])'''
+
+    #for 16S the 115 nucleotides before and 33 nucleotides after mature 16S rRNA(first cleavage product by RNaseIII 17S)
+    #for 23S 20nucleotides before starting position and 20 nucleotides after ending positions.
+    gene_dic = OrderedDict([('rrnB', (_16S(4166544, 4168233), _23S(4168621, 4171564))),
+                            ('rrnC', (_16S(3941693, 3943382), _23S(3943684, 3946627))),
+                            ('rrnD', (_16S(3427188, 3428877), _23S(3423880, 3426823))),
+                            ('rrnE', (_16S(4208032, 4209721), _23S(4210023, 4212966))),
+                            ('rrnG', (_16S(2729583, 2731272), _23S(2726281, 2729224))),
+                            ('rrnH', (_16S(223656, 225345), _23S(225759, 228682))),
+                            ('rrnA', (_16S(4035416, 4037105), _23S(4037499, 4040443)))])
 
     all_operons = ['rrnB', 'rrnC', 'rrnD', 'rrnE', 'rrnG', 'rrnH', 'rrnA']
 
-    ref_genome_fasta_16S = 'data/16S_new.fasta'
+    ref_genome_fasta_17S = 'data/17S_new.fasta'
     #ref_genome_fasta_23S = 'rrlA.fasta'
     ref_genome_fasta_23S = 'data/23S_new.fasta'
 
@@ -134,7 +144,6 @@ def data_generator(index, standard_colour, ACA_colour, MqsR_colour, symbol):
 
         for value in dataframe[operon].dropna():
 
-            #if value in range (1, 1453):
             if '+AC0-' in str(value):
                 value = int(float(str(value)[4:]))
                 values_list_pos.append(value)
@@ -160,11 +169,6 @@ def data_generator(index, standard_colour, ACA_colour, MqsR_colour, symbol):
     counter_neg = Counter(values_list_neg)
 
     # Puts all the reads from different operons on the same blank operon for both 16S and 23S mature RNA-s.
-    #counter_pos_16S = mature_ribosome_RNA_divider(counter_pos, "16S")
-    #counter_pos_23S = mature_ribosome_RNA_divider(counter_pos, "23S")
-    #counter_neg_16S = mature_ribosome_RNA_divider(counter_neg, "16S")
-    #counter_neg_23S = mature_ribosome_RNA_divider(counter_neg, "23S")
-
     counter_pos_16S, counter_neg_16S = mature_ribosome_RNA_divider(counter_pos, "16S")
     counter_pos_23S, counter_neg_23S = mature_ribosome_RNA_divider(counter_pos, "23S")
 
@@ -182,10 +186,10 @@ def data_generator(index, standard_colour, ACA_colour, MqsR_colour, symbol):
     colour_16S = []
     colour_23S = []
 
-    for fasta in SeqIO.parse(ref_genome_fasta_16S, "fasta"):
+    for fasta in SeqIO.parse(ref_genome_fasta_17S, "fasta"):
         pass
 
-    for index in range(1, LENGTH_OF_MATURE_16S + 1):
+    for index in range(1, LENGTH_OF_MATURE_17S + 1):
 
         if str(fasta.seq[index-1: index+2]) == 'ACA':
             colour_16S.append(ACA_colour)
@@ -193,7 +197,7 @@ def data_generator(index, standard_colour, ACA_colour, MqsR_colour, symbol):
             colour_16S.append(MqsR_colour)
         else:
             colour_16S.append(standard_colour)
-        nucl_data_16S.append(index-20)
+        nucl_data_16S.append(index-115)
         by_strand_sorter(index, y_pos_16S, y_neg_16S, counter_pos_16S, counter_neg_16S)
 
     for fasta in SeqIO.parse(ref_genome_fasta_23S, "fasta"):
@@ -420,7 +424,7 @@ def make_plot_all_reads(_input_, scatter_flag, delta_scatter_flag, MA_flag, thre
 
             for data_key, data_nt in data_dic.items():#[data1, data2, data3, data4]:
 
-                for i in range(-19,20):
+                for i in range(-19,22):
                 
                     index = data_dic['data1']['nucl_data_16S'].index(float(i))
                     hundred_percent_16S += data_nt['y_pos_16S'][index]
@@ -434,7 +438,23 @@ def make_plot_all_reads(_input_, scatter_flag, delta_scatter_flag, MA_flag, thre
                 ax2.scatter(data_nt['nucl_data_23S'], heights_23S, alpha=0.5, c=data_nt['colour_23S'], linewidths=( 0, 0, 0),
                             picker=True, marker = data_nt['symbol'])
                 
+                """df_16S_pos_none = pd.read_csv("16S_count_pos_none.csv", index_col=0, header= [0,1])
+                df_23S_pos_none = pd.read_csv("23S_count_pos_none.csv", index_col=0, header= [0,1]) 
+                df_16S_pos_PNK = pd.read_csv("16S_count_pos_PNK.csv", index_col=0, header= [0,1])
+                df_23S_pos_PNK = pd.read_csv("23S_count_pos_PNK.csv", index_col=0, header= [0,1])
 
+                #a = data_dic['data1']['y_pos_16S']
+                #b = data_dic['data1']['y_pos_23S']
+                df_16S_pos_none["MG_log", "count"] = data_dic['data2']['y_pos_16S']
+                df_23S_pos_none["MG_log", "count"] = data_dic['data2']['y_pos_23S']
+                df_16S_pos_PNK["MG_log", "count"] = data_dic['data1']['y_pos_16S']
+                df_23S_pos_PNK["MG_log", "count"] = data_dic['data1']['y_pos_23S']
+
+                df_16S_pos_none.to_csv("16S_count_pos_none.csv", index=True ,header=True)
+                df_23S_pos_none.to_csv("23S_count_pos_none.csv", index=True ,header=True)
+                df_16S_pos_PNK.to_csv("16S_count_pos_PNK.csv", index=True ,header=True)
+                df_23S_pos_PNK.to_csv("23S_count_pos_PNK.csv", index=True ,header=True)"""
+              
         elif scatter_flag == "count":
             
             #Set y axis label for scatterplot with read counts.
@@ -454,41 +474,41 @@ def make_plot_all_reads(_input_, scatter_flag, delta_scatter_flag, MA_flag, thre
                 ax2.scatter(data_nt['nucl_data_23S'], [-1 * data for data in data_nt['y_neg_23S']],
                             alpha=0.5, c=data_nt['colour_23S'], linewidths=( 0, 0, 0), picker=True, marker = data_nt['symbol'])
         
-        """df_16S_pos_none = pd.read_csv("16S_count_pos_none.csv", index_col=0, header= [0,1])
-        df_23S_pos_none = pd.read_csv("23S_count_pos_none.csv", index_col=0, header= [0,1]) 
-        df_16S_pos_PNK = pd.read_csv("16S_count_pos_PNK.csv", index_col=0, header= [0,1])
-        df_23S_pos_PNK = pd.read_csv("23S_count_pos_PNK.csv", index_col=0, header= [0,1])
-        
-        #a = data_dic['data1']['y_pos_16S']
-        #b = data_dic['data1']['y_pos_23S']
-        df_16S_pos_none["MG_log", "count"] = data_dic['data2']['y_pos_16S']
-        df_23S_pos_none["MG_log", "count"] = data_dic['data2']['y_pos_23S']
-        df_16S_pos_PNK["MG_log", "count"] = data_dic['data1']['y_pos_16S']
-        df_23S_pos_PNK["MG_log", "count"] = data_dic['data1']['y_pos_23S']
+            '''df_16S_pos_none = pd.read_csv("tables/17S_count_pos_TAP.csv", index_col=0, header= [0,1])
+            df_23S_pos_none = pd.read_csv("tables/23S_count_pos_TAP_2.csv", index_col=0, header= [0,1]) 
+            df_16S_pos_PNK = pd.read_csv("tables/17S_count_neg_TAP.csv", index_col=0, header= [0,1])
+            df_23S_pos_PNK = pd.read_csv("tables/23S_count_neg_TAP_2.csv", index_col=0, header= [0,1])
 
-        df_16S_pos_none.to_csv("16S_count_pos_none.csv", index=True ,header=True)
-        df_23S_pos_none.to_csv("23S_count_pos_none.csv", index=True ,header=True)
-        df_16S_pos_PNK.to_csv("16S_count_pos_PNK.csv", index=True ,header=True)
-        df_23S_pos_PNK.to_csv("23S_count_pos_PNK.csv", index=True ,header=True)"""
+            #a = data_dic['data1']['y_pos_16S']
+            #b = data_dic['data1']['y_pos_23S']
+            df_16S_pos_none["MG_log", "count"] = data_dic['data3']['y_pos_16S']
+            df_23S_pos_none["MG_log", "count"] = data_dic['data3']['y_pos_23S']
+            df_16S_pos_PNK["MG_log", "count"] = data_dic['data3']['y_neg_16S']
+            df_23S_pos_PNK["MG_log", "count"] = data_dic['data3']['y_neg_23S']
 
-        count_reads_1_16S = 0
-        count_reads_2_16S = 0
-        count_reads_1_23S = 0
-        count_reads_2_23S = 0
+            df_16S_pos_none.to_csv("tables/17S_count_pos_TAP.csv", index=True ,header=True)
+            df_23S_pos_none.to_csv("tables/23S_count_pos_TAP_2.csv", index=True ,header=True)
+            df_16S_pos_PNK.to_csv("tables/17S_count_neg_TAP.csv", index=True ,header=True)
+            df_23S_pos_PNK.to_csv("tables/23S_count_neg_TAP_2.csv", index=True ,header=True)'''
+
+            count_reads_1_16S = 0
+            count_reads_2_16S = 0
+            count_reads_1_23S = 0
+            count_reads_2_23S = 0
         
-        for count_1 in data_dic['data1']['y_pos_16S']:#, data_dic['data2']['y_pos_16S']:
-            count_reads_1_16S += count_1
+        for count_1_16S in data_dic['data1']['y_pos_16S']:#[0:115 + 1 + 20 + 1]:#, data_dic['data2']['y_pos_16S']:
+            count_reads_1_16S += count_1_16S
             #count_reads_2 += count_2
             
-        for count_2 in data_dic['data2']['y_pos_16S']:#, data_dic['data2']['y_pos_16S']:
-            count_reads_2_16S += count_2
+        for count_2_16S in data_dic['data2']['y_pos_16S']:#[0:115 + 1 + 20 + 1]:#, data_dic['data2']['y_pos_16S']:
+            count_reads_2_16S += count_2_16S
             
-        for count_1 in data_dic['data1']['y_pos_23S']:#, data_dic['data2']['y_pos_16S']:
-            count_reads_1_23S += count_1
+        for count_1_23S in data_dic['data1']['y_pos_23S']:#[0:42]:#, data_dic['data2']['y_pos_16S']:
+            count_reads_1_23S += count_1_23S
             #count_reads_2 += count_2
             
-        for count_2 in data_dic['data2']['y_pos_23S']:#, data_dic['data2']['y_pos_16S']:
-            count_reads_2_23S += count_2
+        for count_2_23S in data_dic['data2']['y_pos_23S']:#[0:42]:#, data_dic['data2']['y_pos_16S']:
+            count_reads_2_23S += count_2_23S
             
         print count_reads_1_16S
         print count_reads_2_16S
